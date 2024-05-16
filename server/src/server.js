@@ -76,12 +76,18 @@ function sayHelloBiDirectionalStreamReply(call) {
   console.log('we reach here inside the bi directional stream reply')
 }
 
+const path = '../../data/flags/';
+//const path = '../../data/big/';
+//const extension = '.png';
+//const extension = '.jpeg';
+const extension = '.jpg';
+
 function sendFile(call, file) {
   const _contents = fs.readFileSync(file, 'base64');
   let contents = _contents;
 
   let chunk = 0;
-  const chunkSize = 100000;
+  const chunkSize = 10000000;
 
   do {
     let currentChunk;
@@ -122,18 +128,20 @@ const executeOnAllFlags = (path, callback) => {
 };
 
 function downloadFile(call) {
-  executeOnAllFlags('../../data/flags/', (files) => {
+  executeOnAllFlags(path, (files) => {
     let time = 0;
+    for (i = 0; i < 20; ++i) {
     files.forEach(file => {
-      if (file.endsWith('.png')) {
+      if (true || file.endsWith(extension)) {
         setTimeout(() => {
           console.log('send the next image ' + file)
-          sendFile(call, '../../data/flags/' + file);
+          sendFile(call, path + file);
         }, time);
 
-        time += 250;
+        time += 10;
       }
     });
+    }
 
     setTimeout(() => {
       console.log('end of call')

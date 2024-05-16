@@ -47,6 +47,18 @@ const greeter = () => {
 };
 
 const fileService = () => {
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  const image = new Image();
+  image.onload = function() {
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+  };
+
+
+
+
+
   const greeterService = new FileServiceClient('http://localhost:9090');
 
   const request = new DownloadFileRequest();
@@ -57,7 +69,7 @@ const fileService = () => {
   fileCall.on('data', function(response) {
     if (response.getSize() === 0 && response.getChunk() === -1) {
       console.log('...', response.getName());
-      const image = document.getElementById('image');
+      // const image = document.getElementById('image');
       image.src = 'data:image/png;base64,' + combinedData;
 
       combinedData = '';

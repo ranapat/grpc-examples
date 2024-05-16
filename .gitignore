@@ -1,7 +1,11 @@
 # generic
 
+data/big
 node_modules/
 dist/*
+
+# os
+.DS_Store
 
 # editor files
 *~

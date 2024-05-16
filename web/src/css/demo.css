@@ -6,8 +6,6 @@ body, html {
 
 .center {
   margin: auto;
-  width: 50%;
-  padding: 10px;
 }
 
 .unselectable {
