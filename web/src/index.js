@@ -1,20 +1,38 @@
 import './css/demo.css';
 
-// import initialise from 'org.ranapat.grpc.examples';
+import { GreeterClient } from 'org.ranapat.grpc.examples/web/protos/simple_grpc_web_pb'
+import { HelloRequest } from 'org.ranapat.grpc.examples/web/protos/simple_pb'
 
 const init = () => {
-  const messages = require('../protos/simple_pb');
-  const services = require('../protos/simple_grpc_web_pb');
+  const greeterService = new GreeterClient('http://localhost:9090');
 
-  var echoService = new services.GreeterClient('http://localhost:9090');
-
-  var request = new messages.HelloRequest();
+  const request = new HelloRequest();
   request.setName('Chrome browser');
 
-  echoService.sayHello(request, {}, function(err, response) {
-    console.error(err)
-    console.log(response)
-    console.log(response.getMessage())
+  greeterService.sayHello(request, {}, (err, response) => {
+    if (err) {
+      console.error(err)
+    } else {
+      console.log('response message', response.getMessage())
+    }
+  });
+
+  const call = greeterService.sayHelloStreamReply(request, {});
+  call.on('data', (response) => {
+    console.log('Received "' + response.getMessage() + '"');
+  });
+  call.on('end', () => {
+    console.log('call ended')
+    // The server has finished sending
+  });
+  call.on('error', (e) => {
+    console.error(e)
+    // An error has occurred and the stream has been closed.
+  });
+  call.on('status', (status) => {
+    console.log('status is ', status)
+    // process status
   });
 };
+
 init();
