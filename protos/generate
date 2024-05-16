@@ -1,0 +1,20 @@
+#!/bin/bash
+
+grpc_tools_node_protoc \
+    --js_out=import_style=commonjs,binary:../server/protos/ \
+    --grpc_out=grpc_js:../server/protos/ \
+    simple.proto
+
+grpc_tools_node_protoc \
+    --js_out=import_style=commonjs,binary:../client/protos/ \
+    --grpc_out=grpc_js:../client/protos/ \
+    simple.proto
+
+grpc_tools_node_protoc \
+    --js_out=import_style=commonjs,binary:../web/protos/ \
+    --grpc_out=grpc_js:../web/protos/ \
+    simple.proto
+
+grpc_tools_node_protoc \
+    --grpc-web_out=import_style=commonjs,mode=grpcwebtext:../web/protos/ \
+    simple.proto
