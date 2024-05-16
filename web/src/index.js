@@ -1,9 +1,20 @@
 import './css/demo.css';
 
-import { GreeterClient } from 'org.ranapat.grpc.examples/web/protos/simple_grpc_web_pb'
-import { HelloRequest } from 'org.ranapat.grpc.examples/web/protos/simple_pb'
+import {
+  GreeterClient,
+  FileServiceClient
+} from 'org.ranapat.grpc.examples/web/protos/simple_grpc_web_pb'
+import {
+  HelloRequest,
+  DownloadFileRequest
+} from 'org.ranapat.grpc.examples/web/protos/simple_pb'
 
 const init = () => {
+  greeter();
+  fileService();
+};
+
+const greeter = () => {
   const greeterService = new GreeterClient('http://localhost:9090');
 
   const request = new HelloRequest();
@@ -30,6 +41,38 @@ const init = () => {
     // An error has occurred and the stream has been closed.
   });
   call.on('status', (status) => {
+    console.log('status is ', status)
+    // process status
+  });
+};
+
+const fileService = () => {
+  const greeterService = new FileServiceClient('http://localhost:9090');
+
+  const request = new DownloadFileRequest();
+  request.setFilename('anything');
+
+  let combinedData = '';
+  const fileCall = greeterService.downloadFile(request, {});
+  fileCall.on('data', function(response) {
+    if (response.getSize() === 0 && response.getChunk() === -1) {
+      console.log('...', response.getName());
+      const image = document.getElementById('image');
+      image.src = 'data:image/png;base64,' + combinedData;
+
+      combinedData = '';
+    } else {
+      combinedData += response.getData();
+    }
+  });
+  fileCall.on('end', function() {
+    //
+  });
+  fileCall.on('error', function(e) {
+    console.error(e)
+    // An error has occurred and the stream has been closed.
+  });
+  fileCall.on('status', function(status) {
     console.log('status is ', status)
     // process status
   });

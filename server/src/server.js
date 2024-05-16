@@ -1,23 +1,6 @@
-/*
- *
- * Copyright 2015 gRPC authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
 var PROTO_PATH = __dirname + '/../../protos/simple.proto';
 
+const fs = require('fs');
 var grpc = require('@grpc/grpc-js');
 var protoLoader = require('@grpc/proto-loader');
 var packageDefinition = protoLoader.loadSync(
@@ -37,6 +20,8 @@ var hello_proto = grpc.loadPackageDefinition(packageDefinition).helloworld;
  */
 
 function sayHi(call, callback) {
+  console.log('so far ok?', call, callback);
+
   callback(null, {
     message: 'Hi back'
   });
@@ -48,7 +33,7 @@ function sayHello(call, callback) {
   });
 }
 
-function sayHelloStreamReply(call, callback) {
+function sayHelloStreamReply(call) {
   console.log('we enter here inside the stream reply')
   // call.emit('error', {code: grpc.status.INVALID_ARGUMENT, details: 'request missing required field: name'});
   call.write({
@@ -61,7 +46,7 @@ function sayHelloStreamReply(call, callback) {
   console.log('we reach here inside the stream reply')
 }
 
-function sayHelloBiDirectionalStreamReply(call, callback) {
+function sayHelloBiDirectionalStreamReply(call) {
   console.log('we enter here inside the bi directional stream reply')
   call.on('data', function(request) {
     console.log('Called "' + request.name + '"', request);
@@ -91,12 +76,82 @@ function sayHelloBiDirectionalStreamReply(call, callback) {
   console.log('we reach here inside the bi directional stream reply')
 }
 
+function sendFile(call, file) {
+  const _contents = fs.readFileSync(file, 'base64');
+  let contents = _contents;
+
+  let chunk = 0;
+  const chunkSize = 100000;
+
+  do {
+    let currentChunk;
+
+    if (chunkSize > contents.length) {
+      currentChunk = contents;
+      contents = '';
+    } else {
+      currentChunk = contents.slice(0, chunkSize);
+      contents = contents.slice(chunkSize, contents.length);
+    }
+
+    console.log('...', file, chunk, currentChunk.length);
+    call.write({
+      name: file,
+      data: currentChunk,
+      size: currentChunk.length,
+      chunk: chunk++
+    });
+  } while (contents);
+
+  call.write({
+    name: file,
+    data: undefined,
+    size: 0,
+    chunk: -1
+  })
+}
+
+const executeOnAllFlags = (path, callback) => {
+  fs.readdir(path, function (err, files) {
+    if (err) {
+      console.error(err)
+    }
+
+    callback(files);
+  });
+};
+
+function downloadFile(call) {
+  executeOnAllFlags('../../data/flags/', (files) => {
+    let time = 0;
+    files.forEach(file => {
+      if (file.endsWith('.png')) {
+        setTimeout(() => {
+          console.log('send the next image ' + file)
+          sendFile(call, '../../data/flags/' + file);
+        }, time);
+
+        time += 250;
+      }
+    });
+
+    setTimeout(() => {
+      console.log('end of call')
+      call.end();
+    }, time + 2050);
+
+  });
+}
+
 /**
  * Starts an RPC server that receives requests for the Greeter service at the
  * sample server port
  */
 function main() {
   var server = new grpc.Server();
+  server.addService(hello_proto.FileService.service, {
+    downloadFile
+  });
   server.addService(hello_proto.Greeter.service, {
     sayHi,
     sayHello,

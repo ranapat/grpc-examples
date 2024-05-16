@@ -30,6 +30,114 @@ proto.helloworld = require('./simple_pb.js');
  * @struct
  * @final
  */
+proto.helloworld.FileServiceClient =
+    function(hostname, credentials, options) {
+  if (!options) options = {};
+  options.format = 'text';
+
+  /**
+   * @private @const {!grpc.web.GrpcWebClientBase} The client
+   */
+  this.client_ = new grpc.web.GrpcWebClientBase(options);
+
+  /**
+   * @private @const {string} The hostname
+   */
+  this.hostname_ = hostname.replace(/\/+$/, '');
+
+};
+
+
+/**
+ * @param {string} hostname
+ * @param {?Object} credentials
+ * @param {?grpc.web.ClientOptions} options
+ * @constructor
+ * @struct
+ * @final
+ */
+proto.helloworld.FileServicePromiseClient =
+    function(hostname, credentials, options) {
+  if (!options) options = {};
+  options.format = 'text';
+
+  /**
+   * @private @const {!grpc.web.GrpcWebClientBase} The client
+   */
+  this.client_ = new grpc.web.GrpcWebClientBase(options);
+
+  /**
+   * @private @const {string} The hostname
+   */
+  this.hostname_ = hostname.replace(/\/+$/, '');
+
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.helloworld.DownloadFileRequest,
+ *   !proto.helloworld.DataChunk>}
+ */
+const methodDescriptor_FileService_DownloadFile = new grpc.web.MethodDescriptor(
+  '/helloworld.FileService/DownloadFile',
+  grpc.web.MethodType.SERVER_STREAMING,
+  proto.helloworld.DownloadFileRequest,
+  proto.helloworld.DataChunk,
+  /**
+   * @param {!proto.helloworld.DownloadFileRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.helloworld.DataChunk.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.helloworld.DownloadFileRequest} request The request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!grpc.web.ClientReadableStream<!proto.helloworld.DataChunk>}
+ *     The XHR Node Readable Stream
+ */
+proto.helloworld.FileServiceClient.prototype.downloadFile =
+    function(request, metadata) {
+  return this.client_.serverStreaming(this.hostname_ +
+      '/helloworld.FileService/DownloadFile',
+      request,
+      metadata || {},
+      methodDescriptor_FileService_DownloadFile);
+};
+
+
+/**
+ * @param {!proto.helloworld.DownloadFileRequest} request The request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!grpc.web.ClientReadableStream<!proto.helloworld.DataChunk>}
+ *     The XHR Node Readable Stream
+ */
+proto.helloworld.FileServicePromiseClient.prototype.downloadFile =
+    function(request, metadata) {
+  return this.client_.serverStreaming(this.hostname_ +
+      '/helloworld.FileService/DownloadFile',
+      request,
+      metadata || {},
+      methodDescriptor_FileService_DownloadFile);
+};
+
+
+/**
+ * @param {string} hostname
+ * @param {?Object} credentials
+ * @param {?grpc.web.ClientOptions} options
+ * @constructor
+ * @struct
+ * @final
+ */
 proto.helloworld.GreeterClient =
     function(hostname, credentials, options) {
   if (!options) options = {};

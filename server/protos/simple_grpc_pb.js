@@ -1,23 +1,30 @@
 // GENERATED CODE -- DO NOT EDIT!
 
-// Original file comments:
-// Copyright 2015 gRPC authors.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
 'use strict';
 var grpc = require('@grpc/grpc-js');
 var simple_pb = require('./simple_pb.js');
+
+function serialize_helloworld_DataChunk(arg) {
+  if (!(arg instanceof simple_pb.DataChunk)) {
+    throw new Error('Expected argument of type helloworld.DataChunk');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_helloworld_DataChunk(buffer_arg) {
+  return simple_pb.DataChunk.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_helloworld_DownloadFileRequest(arg) {
+  if (!(arg instanceof simple_pb.DownloadFileRequest)) {
+    throw new Error('Expected argument of type helloworld.DownloadFileRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_helloworld_DownloadFileRequest(buffer_arg) {
+  return simple_pb.DownloadFileRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
 
 function serialize_helloworld_HelloReply(arg) {
   if (!(arg instanceof simple_pb.HelloReply)) {
@@ -64,6 +71,21 @@ function deserialize_helloworld_HiRequest(buffer_arg) {
 }
 
 
+var FileServiceService = exports.FileServiceService = {
+  downloadFile: {
+    path: '/helloworld.FileService/DownloadFile',
+    requestStream: false,
+    responseStream: true,
+    requestType: simple_pb.DownloadFileRequest,
+    responseType: simple_pb.DataChunk,
+    requestSerialize: serialize_helloworld_DownloadFileRequest,
+    requestDeserialize: deserialize_helloworld_DownloadFileRequest,
+    responseSerialize: serialize_helloworld_DataChunk,
+    responseDeserialize: deserialize_helloworld_DataChunk,
+  },
+};
+
+exports.FileServiceClient = grpc.makeGenericClientConstructor(FileServiceService);
 // The greeting service definition.
 var GreeterService = exports.GreeterService = {
   // Sends a greeting

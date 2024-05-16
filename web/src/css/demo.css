@@ -1,6 +1,13 @@
 body, html {
+  width: 100%;
   height: 100%;
   padding: 0; margin: 0;
+}
+
+.center {
+  margin: auto;
+  width: 50%;
+  padding: 10px;
 }
 
 .unselectable {
@@ -10,11 +17,4 @@ body, html {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-
-  font-family: Helvetica;
-  color: black;
-  font-size: 13px;
-  padding: 10px;
-  width: 120px;
-  margin-left: -60px;
 }
