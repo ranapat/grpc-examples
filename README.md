@@ -26,6 +26,12 @@ cd protos
 ./generate
 ```
 
+### install npm modules
+
+```
+npm i
+```
+
 ## run the example
 
 ### start server
