@@ -79,11 +79,30 @@ function sayHelloBiDirectionalStreamReply(call) {
 }
 
 //const path = '../../data/flags/';
-const path = '../../data/numbers/';
-//const path = '../../data/big/';
+//const path = '../../data/numbers/';
+const path = '../../data/big/';
 const extension = '.png';
 //const extension = '.jpeg';
 //const extension = '.jpg';
+
+function sendBigFile(call, file) {
+  let videoDataStream = fs.createReadStream(file);
+  videoDataStream
+    .on('data', (chunk) => {
+      call.write({
+        name: file,
+        data: chunk,
+        width: undefined,
+        height: undefined,
+        type: undefined,
+        size: chunk.length,
+        chunk: -1
+      });
+    })
+    .on('end', () => {
+      call.end();
+    });
+}
 
 function sendFile(call, file) {
   const binary = fs.readFileSync(file);
@@ -104,7 +123,6 @@ function sendFile(call, file) {
       content = content.slice(chunkMaxSize, content.length);
     }
 
-    console.log('...', file, chunk, currentChunk.length);
     call.write({
       name: file,
       data: currentChunk,
@@ -127,7 +145,18 @@ const executeOnAllFlags = (path, callback) => {
   });
 };
 
+
+/// ffmpeg -i park.mp4 -c:v libvpx -crf 10 -b:v 1M -c:a libvorbis output-file.webm
+/*
+<video controls>
+  <source src="devstories.webm" type='video/webm;codecs="vp8, vorbis"'/>
+  <source src="devstories.mp4" type='video/mp4;codecs="avc1.42E01E, mp4a.40.2"'/>
+</video>
+  */
+
 function downloadFile(call) {
+  //sendBigFile(call, '../../data/video/output-file.webm');
+
   executeOnAllFlags(path, (files) => {
     let time = 0;
     for (i = 0; i < 200; ++i) {
@@ -138,7 +167,7 @@ function downloadFile(call) {
           sendFile(call, path + file);
         }, time);
 
-        time += 1 * 41;
+        time += /*10 * 41*/1000;
       }
     });
     }

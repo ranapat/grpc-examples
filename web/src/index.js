@@ -14,6 +14,10 @@ import {
 const init = () => {
   greeter();
   fileService();
+  /*document.getElementById('button').onclick = () => {
+    fileService();
+    document.getElementById('button').disabled = true;
+  };*/
 };
 
 const greeter = () => {
@@ -61,6 +65,7 @@ const fileService = () => {
   console.warn = function(){};
 
   //
+
       var width = window.innerWidth;
       var height = window.innerHeight;
       var renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -105,6 +110,73 @@ const fileService = () => {
 
 
 
+  //
+  /*
+  const EOF_INDICATOR = 0xffffffff
+  const videoTag = document.getElementById("vid");
+  videoTag.crossOrigin = 'anonymous';
+  const myMediaSource = new MediaSource();
+  const url = URL.createObjectURL(myMediaSource);
+  videoTag.src = url;
+
+  let videoSourceBuffer;
+
+
+  var chunks = [];
+  let sourceopenOnce = false;
+  myMediaSource.addEventListener('sourceopen', () => {
+    if (sourceopenOnce) {
+      return;
+    }
+
+    sourceopenOnce = true;
+    console.log('myMediaSource :: sourceopen');
+
+
+
+    //var mimeCodec = 'video/mp4; codecs="avc1.640032"; profiles="mp42,mp41,isom,avc1"';
+    var mimeCodec = 'video/webm;codecs="vp8, vorbis"';
+if (MediaSource.isTypeSupported(mimeCodec)) {
+  // Create Media Source
+  console.log('encoding is OK')
+} else {
+  console.error("Unsupported media format");
+}
+
+    let videoStarted = false;
+
+    videoSourceBuffer = myMediaSource.addSourceBuffer(mimeCodec);
+
+    videoSourceBuffer.addEventListener('updateend', () => {
+      console.log('videoSourceBuffer :: updateend', myMediaSource.readyState);
+
+      if (chunks.length == 1 && chunks[0] == EOF_INDICATOR) {
+        console.log('... finally try to play the video')
+
+        try { myMediaSource.endOfStream(); } catch (e) {}
+        // videoTag.play();
+        // console.log('click the video to play')
+      } else if (!videoSourceBuffer.updating && chunks.length > 0) {
+        console.log('... next chunk to append to buffer')
+
+	videoSourceBuffer.appendBuffer(chunks.shift());
+
+        if (!videoStarted) {
+          videoStarted = true;
+
+          console.log('early play...');
+          videoTag.play();
+        }
+      } else {
+        console.log('... undefined state ...............', chunks.length, videoSourceBuffer.updating)
+      }
+    });
+
+  });
+*/
+  //
+
+
 
   const greeterService = new FileServiceClient('http://localhost:9090');
 
@@ -115,13 +187,24 @@ const fileService = () => {
   const fileCall = greeterService.downloadFile(request, {});
   fileCall.on('data', (response) => {
     const blob = response.getData();
+
+
+    /*if (!videoSourceBuffer || videoSourceBuffer.updating || chunks.length) {
+      console.log('!! push')
+      chunks.push(blob);
+    } else {
+      console.log('++ append')
+      videoSourceBuffer.appendBuffer(blob);
+    }*/
+
+    // audioSourceBuffer.appendBuffer(audioData);
+
+
+
     combinedData = new Uint8Array([ ...combinedData, ...blob]);
 
     if (response.getChunk() === -1) {
       console.log('...', response.getName(), response.getWidth(), response.getHeight(), response.getSize());
-
-
-
 
       const base64 = btoa(combinedData.reduce(function (data, byte) {
         return data + String.fromCharCode(byte);
@@ -129,30 +212,11 @@ const fileService = () => {
 
       var uri = 'data:image/jpeg;base64,' + base64;
 
-
-
-
       image.src = uri;
 
-
-
-
-
-
-
-
-
-
-
-
-      //const loader = new THREE.ImageLoader();
-
-
-      /*
-      image.src = uri;
-
-      canvas.width = response.getWidth();
-      canvas.height = response.getHeight();*/
+      //image.src = uri;
+      // canvas.width = response.getWidth();
+      // canvas.height = response.getHeight();
 
       combinedData = new Uint8Array();
     } else {
@@ -161,6 +225,7 @@ const fileService = () => {
   });
   fileCall.on('end', function() {
     //
+    chunks.push(EOF_INDICATOR);
   });
   fileCall.on('error', function(e) {
     console.error(e)

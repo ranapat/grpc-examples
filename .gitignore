@@ -1,6 +1,7 @@
 # generic
 
 data/big
+data/video
 node_modules/
 dist/*
 
