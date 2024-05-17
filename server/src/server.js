@@ -1,9 +1,11 @@
-var PROTO_PATH = __dirname + '/../../protos/simple.proto';
-
 const fs = require('fs');
-var grpc = require('@grpc/grpc-js');
-var protoLoader = require('@grpc/proto-loader');
-var packageDefinition = protoLoader.loadSync(
+const bufferImageSize = require('buffer-image-size');
+const grpc = require('@grpc/grpc-js');
+const protoLoader = require('@grpc/proto-loader');
+
+const chunkMaxSize = 10000000;
+const PROTO_PATH = __dirname + '/../../protos/simple.proto';
+const packageDefinition = protoLoader.loadSync(
   PROTO_PATH,
   {
     keepCase: true,
@@ -13,7 +15,7 @@ var packageDefinition = protoLoader.loadSync(
     oneofs: true
   }
 );
-var hello_proto = grpc.loadPackageDefinition(packageDefinition).helloworld;
+const hello_proto = grpc.loadPackageDefinition(packageDefinition).helloworld;
 
 /**
  * Implements the SayHello RPC method.
@@ -76,45 +78,43 @@ function sayHelloBiDirectionalStreamReply(call) {
   console.log('we reach here inside the bi directional stream reply')
 }
 
-const path = '../../data/flags/';
+//const path = '../../data/flags/';
+const path = '../../data/numbers/';
 //const path = '../../data/big/';
-//const extension = '.png';
+const extension = '.png';
 //const extension = '.jpeg';
-const extension = '.jpg';
+//const extension = '.jpg';
 
 function sendFile(call, file) {
-  const _contents = fs.readFileSync(file, 'base64');
-  let contents = _contents;
+  const binary = fs.readFileSync(file);
+  const metadata = bufferImageSize(binary);
 
   let chunk = 0;
-  const chunkSize = 10000000;
+  let currentChunk = undefined;
+  let content = binary;
 
   do {
     let currentChunk;
 
-    if (chunkSize > contents.length) {
-      currentChunk = contents;
-      contents = '';
+    if (chunkMaxSize > content.length) {
+      currentChunk = content;
+      content = undefined;
     } else {
-      currentChunk = contents.slice(0, chunkSize);
-      contents = contents.slice(chunkSize, contents.length);
+      currentChunk = content.slice(0, chunkMaxSize);
+      content = content.slice(chunkMaxSize, content.length);
     }
 
     console.log('...', file, chunk, currentChunk.length);
     call.write({
       name: file,
       data: currentChunk,
-      size: currentChunk.length,
-      chunk: chunk++
+      width: metadata.width,
+      height: metadata.height,
+      type: metadata.type,
+      size: binary.length,
+      chunk: content ? chunk++ : -1
     });
-  } while (contents);
-
-  call.write({
-    name: file,
-    data: undefined,
-    size: 0,
-    chunk: -1
-  })
+  } while (content);
 }
 
 const executeOnAllFlags = (path, callback) => {
@@ -130,15 +130,15 @@ const executeOnAllFlags = (path, callback) => {
 function downloadFile(call) {
   executeOnAllFlags(path, (files) => {
     let time = 0;
-    for (i = 0; i < 20; ++i) {
+    for (i = 0; i < 200; ++i) {
     files.forEach(file => {
-      if (true || file.endsWith(extension)) {
+      if (file.endsWith(extension)) {
         setTimeout(() => {
           console.log('send the next image ' + file)
           sendFile(call, path + file);
         }, time);
 
-        time += 10;
+        time += 3 * 41;
       }
     });
     }

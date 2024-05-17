@@ -186,9 +186,12 @@ proto.helloworld.DataChunk.prototype.toObject = function(opt_includeInstance) {
 proto.helloworld.DataChunk.toObject = function(includeInstance, msg) {
   var f, obj = {
     name: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    data: jspb.Message.getFieldWithDefault(msg, 2, ""),
-    size: jspb.Message.getFieldWithDefault(msg, 3, 0),
-    chunk: jspb.Message.getFieldWithDefault(msg, 4, 0)
+    data: msg.getData_asB64(),
+    width: jspb.Message.getFieldWithDefault(msg, 3, 0),
+    height: jspb.Message.getFieldWithDefault(msg, 4, 0),
+    type: jspb.Message.getFieldWithDefault(msg, 5, ""),
+    size: jspb.Message.getFieldWithDefault(msg, 6, 0),
+    chunk: jspb.Message.getFieldWithDefault(msg, 7, 0)
   };
 
   if (includeInstance) {
@@ -230,14 +233,26 @@ proto.helloworld.DataChunk.deserializeBinaryFromReader = function(msg, reader) {
       msg.setName(value);
       break;
     case 2:
-      var value = /** @type {string} */ (reader.readString());
+      var value = /** @type {!Uint8Array} */ (reader.readBytes());
       msg.setData(value);
       break;
     case 3:
       var value = /** @type {number} */ (reader.readInt32());
-      msg.setSize(value);
+      msg.setWidth(value);
       break;
     case 4:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setHeight(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setType(value);
+      break;
+    case 6:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setSize(value);
+      break;
+    case 7:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setChunk(value);
       break;
@@ -277,24 +292,45 @@ proto.helloworld.DataChunk.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getData();
+  f = message.getData_asU8();
   if (f.length > 0) {
-    writer.writeString(
+    writer.writeBytes(
       2,
       f
     );
   }
-  f = message.getSize();
+  f = message.getWidth();
   if (f !== 0) {
     writer.writeInt32(
       3,
       f
     );
   }
-  f = message.getChunk();
+  f = message.getHeight();
   if (f !== 0) {
     writer.writeInt32(
       4,
+      f
+    );
+  }
+  f = message.getType();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
+      f
+    );
+  }
+  f = message.getSize();
+  if (f !== 0) {
+    writer.writeInt32(
+      6,
+      f
+    );
+  }
+  f = message.getChunk();
+  if (f !== 0) {
+    writer.writeInt32(
+      7,
       f
     );
   }
@@ -320,28 +356,52 @@ proto.helloworld.DataChunk.prototype.setName = function(value) {
 
 
 /**
- * optional string data = 2;
- * @return {string}
+ * optional bytes data = 2;
+ * @return {!(string|Uint8Array)}
  */
 proto.helloworld.DataChunk.prototype.getData = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+  return /** @type {!(string|Uint8Array)} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /**
- * @param {string} value
+ * optional bytes data = 2;
+ * This is a type-conversion wrapper around `getData()`
+ * @return {string}
+ */
+proto.helloworld.DataChunk.prototype.getData_asB64 = function() {
+  return /** @type {string} */ (jspb.Message.bytesAsB64(
+      this.getData()));
+};
+
+
+/**
+ * optional bytes data = 2;
+ * Note that Uint8Array is not supported on all browsers.
+ * @see http://caniuse.com/Uint8Array
+ * This is a type-conversion wrapper around `getData()`
+ * @return {!Uint8Array}
+ */
+proto.helloworld.DataChunk.prototype.getData_asU8 = function() {
+  return /** @type {!Uint8Array} */ (jspb.Message.bytesAsU8(
+      this.getData()));
+};
+
+
+/**
+ * @param {!(string|Uint8Array)} value
  * @return {!proto.helloworld.DataChunk} returns this
  */
 proto.helloworld.DataChunk.prototype.setData = function(value) {
-  return jspb.Message.setProto3StringField(this, 2, value);
+  return jspb.Message.setProto3BytesField(this, 2, value);
 };
 
 
 /**
- * optional int32 size = 3;
+ * optional int32 width = 3;
  * @return {number}
  */
-proto.helloworld.DataChunk.prototype.getSize = function() {
+proto.helloworld.DataChunk.prototype.getWidth = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
@@ -350,16 +410,16 @@ proto.helloworld.DataChunk.prototype.getSize = function() {
  * @param {number} value
  * @return {!proto.helloworld.DataChunk} returns this
  */
-proto.helloworld.DataChunk.prototype.setSize = function(value) {
+proto.helloworld.DataChunk.prototype.setWidth = function(value) {
   return jspb.Message.setProto3IntField(this, 3, value);
 };
 
 
 /**
- * optional int32 chunk = 4;
+ * optional int32 height = 4;
  * @return {number}
  */
-proto.helloworld.DataChunk.prototype.getChunk = function() {
+proto.helloworld.DataChunk.prototype.getHeight = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 4, 0));
 };
 
@@ -368,8 +428,62 @@ proto.helloworld.DataChunk.prototype.getChunk = function() {
  * @param {number} value
  * @return {!proto.helloworld.DataChunk} returns this
  */
-proto.helloworld.DataChunk.prototype.setChunk = function(value) {
+proto.helloworld.DataChunk.prototype.setHeight = function(value) {
   return jspb.Message.setProto3IntField(this, 4, value);
+};
+
+
+/**
+ * optional string type = 5;
+ * @return {string}
+ */
+proto.helloworld.DataChunk.prototype.getType = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.helloworld.DataChunk} returns this
+ */
+proto.helloworld.DataChunk.prototype.setType = function(value) {
+  return jspb.Message.setProto3StringField(this, 5, value);
+};
+
+
+/**
+ * optional int32 size = 6;
+ * @return {number}
+ */
+proto.helloworld.DataChunk.prototype.getSize = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 6, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.helloworld.DataChunk} returns this
+ */
+proto.helloworld.DataChunk.prototype.setSize = function(value) {
+  return jspb.Message.setProto3IntField(this, 6, value);
+};
+
+
+/**
+ * optional int32 chunk = 7;
+ * @return {number}
+ */
+proto.helloworld.DataChunk.prototype.getChunk = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.helloworld.DataChunk} returns this
+ */
+proto.helloworld.DataChunk.prototype.setChunk = function(value) {
+  return jspb.Message.setProto3IntField(this, 7, value);
 };
 
 

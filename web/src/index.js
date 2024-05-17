@@ -64,17 +64,28 @@ const fileService = () => {
   const request = new DownloadFileRequest();
   request.setFilename('anything');
 
-  let combinedData = '';
+  let combinedData = new Uint8Array();
   const fileCall = greeterService.downloadFile(request, {});
-  fileCall.on('data', function(response) {
-    if (response.getSize() === 0 && response.getChunk() === -1) {
-      console.log('...', response.getName());
-      // const image = document.getElementById('image');
-      image.src = 'data:image/png;base64,' + combinedData;
+  fileCall.on('data', (response) => {
+    const blob = response.getData();
+    combinedData = new Uint8Array([ ...combinedData, ...blob]);
 
-      combinedData = '';
+    if (response.getChunk() === -1) {
+      console.log('...', response.getName(), response.getWidth(), response.getHeight(), response.getSize());
+
+      const base64 = btoa(combinedData.reduce(function (data, byte) {
+        return data + String.fromCharCode(byte);
+      }, ''));
+
+      var uri = 'data:image/jpeg;base64,' + base64;
+      image.src = uri;
+
+      canvas.width = response.getWidth();
+      canvas.height = response.getHeight();
+
+      combinedData = new Uint8Array();
     } else {
-      combinedData += response.getData();
+      console.log('...', response.getName(), response.getWidth(), response.getHeight(), response.getSize(), response.getChunk());
     }
   });
   fileCall.on('end', function() {

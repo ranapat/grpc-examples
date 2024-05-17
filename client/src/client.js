@@ -90,11 +90,11 @@ function main() {
   const fileCall = fileClient.downloadFile({fileName: 'anything'});
   fileCall.on('data', function(response) {
     console.log('Called ', response.chunk, response.size);
-    combinedData += response.data;
+    /*combinedData += response.data;
     if (response.size === 0 && response.chunk === -1) {
       console.log('single image finished', response.name);
       combinedData = '';
-    }
+    }*/
   });
   fileCall.on('end', function() {
     console.log('call ended')
