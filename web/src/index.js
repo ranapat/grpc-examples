@@ -61,8 +61,8 @@ const fileService = () => {
   console.warn = function(){};
 
   //
-      var width = 800//window.innerWidth;
-      var height = 600//window.innerHeight;
+      var width = window.innerWidth;
+      var height = window.innerHeight;
       var renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(width, height);
       document.body.appendChild(renderer.domElement);
@@ -76,14 +76,15 @@ const fileService = () => {
       };
       texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping;
       let material = new THREE.MeshLambertMaterial({map: texture});
-      let cubeSize = 150;
-      let planeMesh = new THREE.PlaneGeometry(cubeSize, cubeSize);
+  let planeWidthSize = width / 10;
+  let planeHeightSize = height / 10;
+      let planeMesh = new THREE.PlaneGeometry(planeWidthSize, planeHeightSize);
       var cube = new THREE.Mesh(planeMesh, material);
       scene.add(cube);
       var camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
       camera.position.x = 0;
       camera.position.y = 0;
-      camera.position.z = 190;
+      camera.position.z = 250;
       camera.lookAt(cube.position);
       scene.add(camera);
       //Add ambient light to make the scene more light
