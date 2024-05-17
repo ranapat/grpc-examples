@@ -138,7 +138,7 @@ function downloadFile(call) {
           sendFile(call, path + file);
         }, time);
 
-        time += 3 * 41;
+        time += 1 * 41;
       }
     });
     }
