@@ -49,8 +49,8 @@ const greeter = () => {
 };
 
 const fileService = () => {
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
+  /*const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");*/
 
   /*const image = new Image();
   image.onload = function() {
@@ -61,8 +61,8 @@ const fileService = () => {
   console.warn = function(){};
 
   //
-      var width = window.innerWidth;
-      var height = window.innerHeight;
+      var width = 800//window.innerWidth;
+      var height = 600//window.innerHeight;
       var renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(width, height);
       document.body.appendChild(renderer.domElement);
@@ -80,10 +80,10 @@ const fileService = () => {
       let planeMesh = new THREE.PlaneGeometry(cubeSize, cubeSize);
       var cube = new THREE.Mesh(planeMesh, material);
       scene.add(cube);
-      var camera = new THREE.PerspectiveCamera(65, width / height, 0.1, 10000);
+      var camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 10000);
       camera.position.x = 0;
       camera.position.y = 0;
-      camera.position.z = 200;
+      camera.position.z = 190;
       camera.lookAt(cube.position);
       scene.add(camera);
       //Add ambient light to make the scene more light
@@ -92,8 +92,9 @@ const fileService = () => {
   var clock = new THREE.Clock();
       function render() {
         requestAnimationFrame(render);
-        //cube.rotation.y -= 0.005;
-        //cube.rotation.z += 0.005;
+        // cube.rotation.x -= 0.005;
+        // cube.rotation.y -= 0.005;
+        // cube.rotation.z += 0.005;
         renderer.render(scene, camera);
       }
       render();
